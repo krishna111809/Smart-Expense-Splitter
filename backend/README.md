@@ -62,7 +62,8 @@ backend/
 ├── models/
 │   ├── User.js
 │   ├── Group.js
-│   └── Expense.js
+│   ├── Expense.js
+│   └── index.js
 │
 ├── routes/
 │   ├── authRoutes.js
