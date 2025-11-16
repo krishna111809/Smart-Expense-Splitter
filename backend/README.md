@@ -30,7 +30,7 @@ It is built using **Node.js**, **Express**, **MongoDB**, and **JWT Authenticatio
 
 ### 🛡 Security & Middleware
 - Auth middleware for all protected routes
-- CORS with `FRONTEND_ORIGIN`
+- CORS enabled globally using the cors middleware
 - Global error handler
 - Global 404 handler
 
@@ -100,7 +100,6 @@ npm install
 PORT=3000
 MONGO_URI=your_mongo_uri
 JWT_SECRET=your_jwt_secret
-FRONTEND_ORIGIN=your_frontend_origin_url
 ```
 
 > ⚠️ Do NOT commit `.env` to GitHub.
@@ -159,7 +158,6 @@ ALL TESTS PASSED ✅
 - PORT  
 - MONGO_URI  
 - JWT_SECRET  
-- FRONTEND_ORIGIN  
 
 ### Render setup:
 ```
@@ -187,4 +185,3 @@ MIT © Vavilala Krishna Murthi
 
 # 🙌 Contributing
 PRs and issues welcome.
-

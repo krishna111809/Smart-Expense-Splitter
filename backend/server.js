@@ -16,10 +16,7 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-const allowedOrigin = process.env.FRONTEND_ORIGIN || '*';
 app.use(cors({
-  origin: allowedOrigin,
-  credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
