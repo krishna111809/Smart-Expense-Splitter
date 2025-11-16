@@ -99,7 +99,7 @@ npm install
 PORT=3000
 MONGO_URI=your_mongo_uri
 JWT_SECRET=your_jwt_secret
-FRONTEND_ORIGIN=https://smart-expense-splitter-alpha.vercel.app
+FRONTEND_ORIGIN=your_frontend_origin_url
 ```
 
 > ⚠️ Do NOT commit `.env` to GitHub.
