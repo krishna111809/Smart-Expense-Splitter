@@ -16,7 +16,13 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-app.use(cors());
+const allowedOrigin = process.env.FRONTEND_ORIGIN || '*';
+app.use(cors({
+  origin: allowedOrigin,
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 app.use(express.json());
 
 // mount routes
@@ -26,6 +32,16 @@ app.use('/api/expenses', expenseRoutes);
 
 // simple health
 app.get('/health', (req, res) => res.json({ ok: true }));
+
+// 404 and error handlers
+app.use((req, res) => {
+  res.status(404).json({ msg: 'Not found' });
+});
+
+app.use((err, req, res, next) => {
+  console.error('SERVER ERROR:', err);
+  res.status(500).json({ msg: 'Server error' });
+});
 
 // connect to mongo and start server
 mongoose.set('strictQuery', false);

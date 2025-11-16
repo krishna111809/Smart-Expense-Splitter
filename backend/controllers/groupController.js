@@ -1,10 +1,22 @@
 const { Group, User } = require('../models');
 const { getUserIdFromReq } = require('../utils/auth');
 
+// helper to safely check membership
+const isMemberOf = (group, userId) => {
+  if (!group || !Array.isArray(group.members)) return false;
+  return group.members.some(m => {
+    if (!m || !m.userId) return false;
+    if (typeof m.userId === 'object' && (m.userId._id || m.userId._id === 0)) {
+      return m.userId._id.toString() === userId;
+    }
+    return m.userId.toString() === userId;
+  });
+};
+
 // Create group
 exports.createGroup = async (req, res) => {
   try {
-    const userId = getUserIdFromReq(req);
+    const userId = req.userId || getUserIdFromReq(req);
     const { name, description, currency } = req.body;
     if (!name) return res.status(400).json({ msg: 'Name required' });
 
@@ -19,26 +31,26 @@ exports.createGroup = async (req, res) => {
     res.status(201).json({ msg: 'Group created', group });
   } catch (err) {
     console.error('createGroup err', err.message || err);
-    res.status(401).json({ msg: err.message || 'Error' });
+    res.status(500).json({ msg: err.message || 'Error' });
   }
 };
 
 // Get groups for current user
 exports.getMyGroups = async (req, res) => {
   try {
-    const userId = getUserIdFromReq(req);
+    const userId = req.userId || getUserIdFromReq(req);
     const groups = await Group.find({ 'members.userId': userId }).sort({ updatedAt: -1 });
     res.json({ groups });
   } catch (err) {
     console.error('getMyGroups err', err.message || err);
-    res.status(401).json({ msg: err.message || 'Error' });
+    res.status(500).json({ msg: err.message || 'Error' });
   }
 };
 
 // Add member
 exports.addMember = async (req, res) => {
   try {
-    const userId = getUserIdFromReq(req);
+    const userId = req.userId || getUserIdFromReq(req);
     const { groupId } = req.params;
     const { memberUserId, displayName } = req.body;
     if (!memberUserId) return res.status(400).json({ msg: 'memberUserId required' });
@@ -59,24 +71,24 @@ exports.addMember = async (req, res) => {
     res.json({ msg: 'Member added', group });
   } catch (err) {
     console.error('addMember err', err.message || err);
-    res.status(401).json({ msg: err.message || 'Error' });
+    res.status(500).json({ msg: err.message || 'Error' });
   }
 };
 
 // Get group details
 exports.getGroup = async (req, res) => {
   try {
-    const userId = getUserIdFromReq(req);
+    const userId = req.userId || getUserIdFromReq(req);
     const { groupId } = req.params;
     const group = await Group.findById(groupId).populate('members.userId', 'name email');
     if (!group) return res.status(404).json({ msg: 'Group not found' });
 
-    // ensure requester is a member
-    if (!group.members.find(m => m.userId._id.toString() === userId)) return res.status(403).json({ msg: 'Not a member' });
+    const member = isMemberOf(group, userId);
+    if (!member) return res.status(403).json({ msg: 'Not a member' });
 
     res.json({ group });
   } catch (err) {
     console.error('getGroup err', err.message || err);
-    res.status(401).json({ msg: err.message || 'Error' });
+    res.status(500).json({ msg: err.message || 'Error' });
   }
 };
