@@ -1,55 +1,49 @@
-# Smart Expense Splitter – Backend (Node.js + Express + MongoDB)
 
-The **Smart Expense Splitter Backend** provides secure REST APIs for managing  
-**users, groups, members, and expenses**.  
-It is built using **Node.js**, **Express**, **MongoDB**, and **JWT Authentication**.
+# 🚀 Smart Expense Splitter – Backend (MERN)  
+A complete backend system for **group expense management**, with secure authentication, group and member handling, flexible expense splitting, and a full API test suite.
 
 ---
 
-# ⭐ Features
+# ✨ Key Features
 
-### 🔐 Authentication
-- Register & Login users
-- JWT-based protected routes
-- Password hashing with bcrypt
-- `/me` to fetch logged-in user details
+## 🔐 Authentication & Security
+- JWT‑based secure authentication
+- Register & Login with validation
+- Password hashing using bcrypt
+- Protected routes using middleware
+- `/api/auth/me` to fetch logged-in user info
+- Email uniqueness enforcement
 
-### 👥 Groups
-- Create groups
-- Add members
-- Fetch user groups
-- Get group details
-- Owner-only permissions
+## 👥 Groups & Members
+- Create groups with metadata
+- Owner‑based permission system
+- Add members using emailId's
+- Fetch all groups the user belongs to
+- Detailed group info with populated user data
 
-### 💸 Expenses
-- Add expenses
-- Supports EQUAL / CUSTOM / PERCENTAGE splits
-- List group expenses
-- Get single expense
-- Strong validation rules
+## 💸 Expense Management
+Supports 3 split mechanisms:
+- **EQUAL** — amount split equally
+- **CUSTOM** — shares must sum to total amount
+- **PERCENTAGE** — percentages must sum to 100%
 
-### 🛡 Security & Middleware
-- Auth middleware for all protected routes
-- CORS enabled globally using the cors middleware
-- Global error handler
-- Global 404 handler
+## 🧍 User Lookup
+- Get user details by email  
+- Useful for frontend search before adding members
 
----
-
-# 🧰 Tech Stack
-
+## 🧰 Technology Stack
 | Layer | Technology |
-|------|------------|
-| Runtime | Node.js |
-| Framework | Express.js |
-| Database | MongoDB (Atlas) + Mongoose |
-| Auth | JWT, bcrypt.js |
+|-------|------------|
+| Language | Node.js (Express) |
+| Database | MongoDB + Mongoose |
+| Auth | JWT & bcrypt |
 | Validation | express-validator |
-| Dev Tools | nodemon, dotenv |
+| Utils | Custom auth middleware |
+| Testing | axios-based smoke test |
 
 ---
 
-# 📁 Project Structure
+# 📁 Folder Structure
 
 ```
 backend/
@@ -68,21 +62,23 @@ backend/
 ├── routes/
 │   ├── authRoutes.js
 │   ├── groupRoutes.js
-│   └── expenseRoutes.js
+│   ├── expenseRoutes.js
+│   └── userLookup.js
 │
 ├── utils/
 │   ├── auth.js
 │   └── authMiddleware.js
 │
+├── smokeTest.js
 ├── server.js
 ├── package.json
-├── smokeTest.js
-└── .env.example
+├── .env.example
+└── README.md
 ```
 
 ---
 
-# 🔧 Installation
+# ⚙️ Installation & Setup
 
 ## 1. Clone repository
 ```bash
@@ -95,57 +91,78 @@ cd Smart-Expense-Splitter/backend
 npm install
 ```
 
-## 3. Create `.env` file
+## 3. Environment variables  
+Create `.env` file using:
 ```
-PORT=3000
-MONGO_URI=your_mongo_uri
-JWT_SECRET=your_jwt_secret
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secure_jwt_secret
 ```
 
-> ⚠️ Do NOT commit `.env` to GitHub.
-
-## 4. Run server
+## 4. Start server
 ```bash
 npm run dev
 ```
 
 ---
 
-# 📌 API Endpoints
+# 📌 API Endpoints Overview
 
 ## 🔐 Auth (`/api/auth`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/register` | Register new user |
-| POST | `/login` | Login |
-| GET | `/me` | Get authenticated user |
+| POST | `/login` | Login & receive JWT |
+| GET | `/me` | Fetch current user info |
+
+---
 
 ## 👥 Groups (`/api/groups`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/` | Create group |
-| GET | `/` | List user groups |
-| POST | `/:groupId/members` | Add member |
-| GET | `/:groupId` | Group details |
+| POST | `/` | Create a new group |
+| GET | `/` | List groups current user belongs to |
+| POST | `/:groupId/members` | Add a member (owner-only) |
+| GET | `/:groupId` | Get full group details |
+
+---
 
 ## 💸 Expenses (`/api/expenses`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/` | Add expense |
+| POST | `/` | Add new expense |
 | GET | `/?groupId=ID` | List group expenses |
-| GET | `/:id` | Get expense details |
+| GET | `/:id` | Get single expense details |
 
 ---
 
-# 🧪 Smoke Test Script
+## 🔎 USER LOOKUP — `/api/users`
 
-Run full backend tests:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **GET** | `/by-email?email=ID` | Fetch user info by email |
+
+---
+
+# 🧪 Comprehensive Smoke Test
+
+A fully automated script that verifies:
+- Register/Login functionality
+- Duplicate registration error handling
+- Protected route checks (`/me`)
+- Group create & permission tests
+- Member addition (owner-only)
+- Expense validation errors (CUSTOM/PERCENTAGE)
+- Legitimate expense creation
+- Listing expenses
+- Unauthorized access handling
+
+### Run smoke test:
 ```bash
 npm install axios
 node smokeTest.js
 ```
 
-Expected:
+Clear PASS message:
 ```
 ALL TESTS PASSED ✅
 ```
@@ -154,34 +171,36 @@ ALL TESTS PASSED ✅
 
 # ☁ Deployment Guide
 
-### Required env vars:
-- PORT  
-- MONGO_URI  
-- JWT_SECRET  
+### Render/Any Cloud:
+| Setting | Value |
+|--------|--------|
+| Root Directory | `/backend` |
+| Build Command | `npm install` |
+| Start Command | `npm start` |
+| Environment | NODE, MONGODB |
 
-### Render setup:
-```
-Root Directory: /backend
-Build Command: npm install
-Start Command: npm start
-```
+Ensure environment variables are added in dashboard.
 
 ---
 
-# 🚀 Future Enhancements
-- DELETE Group (owner-only)
-- DELETE Expense
-- Edit expense & edit group
-- Soft-delete & audit logs
-- Activity timeline
-- Expense settlement system
-
----
-
-# 📄 License
-MIT © Vavilala Krishna Murthi
+# 🔮 Future Enhancements
+- Update/Delete expenses
+- Update/Delete groups
+- Admin roles for groups
+- Soft delete with audit logs
+- Per-member balance settlement engine
+- Notifications for group activity
+- Scheduled reporting
 
 ---
 
 # 🙌 Contributing
-PRs and issues welcome.
+Pull requests and suggestions are always welcome!
+
+**Author:** *Vavilala Krishna Murthi*  
+**GitHub:** https://github.com/krishna111809  
+
+---
+
+# 📄 License
+MIT License © 2025  

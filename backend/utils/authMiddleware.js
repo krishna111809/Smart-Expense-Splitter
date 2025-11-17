@@ -1,6 +1,5 @@
 const { getUserIdFromReq } = require('./auth');
 
-
 // Middleware to protect routes
 module.exports = (req, res, next) => {
   try {
