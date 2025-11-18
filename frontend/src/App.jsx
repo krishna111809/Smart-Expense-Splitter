@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import CreateGroup from './pages/CreateGroup'
 import GroupDetails from './pages/GroupDetails'
 import ProtectedRoute from './components/ProtectedRoute'
+import GuestRoute from './components/GuestRoute'
 import { ToastContainer } from 'react-toastify'
 
 export default function App(){
@@ -17,8 +18,16 @@ export default function App(){
         <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/create-group" element={<ProtectedRoute><CreateGroup /></ProtectedRoute>} />
         <Route path="/groups/:id" element={<ProtectedRoute><GroupDetails /></ProtectedRoute>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={
+          <GuestRoute>
+            <Login />
+          </GuestRoute>
+        } />
+        <Route path="/register" element={
+          <GuestRoute>
+            <Register />
+          </GuestRoute>
+        } />
       </Routes>
     </div>
   )
