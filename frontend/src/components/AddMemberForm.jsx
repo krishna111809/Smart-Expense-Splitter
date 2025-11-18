@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { groups } from '../api'
 import api from '../api'
 import { toast } from 'react-toastify'
+import { ToastContainer } from 'react-toastify'
 
 export default function AddMemberForm({ groupId, onAdded }) {
   const [email, setEmail] = useState('')
@@ -17,7 +18,6 @@ export default function AddMemberForm({ groupId, onAdded }) {
     }
     try {
       const res = await api.get('/users/by-email', { params: { email: e } })
-      // be tolerant: backend may return .user._id or .user.id
       return res.data?.user?._id || res.data?.user?.id || null
     } catch {
       toast.error("Email not found. User must register first.")
@@ -36,7 +36,6 @@ export default function AddMemberForm({ groupId, onAdded }) {
         setLoading(false)
         return
       }
-
       await groups.addMember(groupId, { memberUserId: userId, displayName: '' })
       toast.success("Member added")
       setEmail('')
@@ -50,8 +49,8 @@ export default function AddMemberForm({ groupId, onAdded }) {
 
   return (
     <form onSubmit={submit} className="mb-3">
+      <ToastContainer/>
       <label className="form-label fw-bold">Add Member by Email</label>
-
       <div className="d-flex" style={{ gap: '8px', maxWidth: '420px' }}>
         <input
           className="form-control form-control-sm"
@@ -60,7 +59,6 @@ export default function AddMemberForm({ groupId, onAdded }) {
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
-
         <button
           className="btn btn-sm btn-primary"
           type="submit"
