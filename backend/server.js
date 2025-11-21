@@ -1,7 +1,16 @@
+// backend/server.js
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const mongoose = require('mongoose');
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET missing in .env — set a strong secret');
+  process.exit(1);
+}
 
 const authRoutes = require('./routes/authRoutes');
 const groupRoutes = require('./routes/groupRoutes');
@@ -17,10 +26,25 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-app.use(cors({
+app.use(helmet());
+
+// Basic rate limiter (adjust as needed)
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: Number(process.env.RATE_LIMIT_MAX || 120), // default 120 requests per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(limiter);
+
+// CORS - restrict origin via env var if provided
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // mount routes
@@ -39,7 +63,11 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error('SERVER ERROR:', err);
-  res.status(500).json({ msg: 'Server error' });
+  if (process.env.NODE_ENV === 'production') {
+    res.status(500).json({ msg: 'Server error' });
+  } else {
+    res.status(500).json({ msg: err.message || 'Server error', stack: err.stack });
+  }
 });
 
 // connect to mongo and start server

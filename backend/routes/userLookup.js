@@ -1,7 +1,9 @@
+// backend/routes/userLookup.js
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
+const { User } = require("../models");
 
+// Lookup user by email
 router.get("/by-email", async (req, res) => {
   try {
     const email = (req.query.email || "").trim().toLowerCase();

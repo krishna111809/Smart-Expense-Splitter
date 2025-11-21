@@ -1,7 +1,8 @@
+// backend/models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 12;
 
 const UserSchema = new mongoose.Schema({
   name: {

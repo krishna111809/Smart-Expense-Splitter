@@ -1,5 +1,5 @@
+// backend/controllers/authController.js
 const { User } = require('../models');
-const { getUserIdFromReq } = require('../utils/auth');
 const { validationResult } = require("express-validator");
 const jwt = require('jsonwebtoken');
 
@@ -7,7 +7,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Register
 exports.register = async (req, res) => {
-  // express-validator errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -36,7 +35,6 @@ exports.register = async (req, res) => {
 
 // Login
 exports.login = async (req, res) => {
-  // express-validator errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -65,10 +63,13 @@ exports.login = async (req, res) => {
 // Get current user info
 exports.me = async (req, res) => {
   try {
-    const userId = req.userId || getUserIdFromReq(req);
-    const user = await User.findById(userId).select('-password');
+    const userId = req.userId;
+    if (!userId) return res.status(401).json({ msg: 'Unauthorized' });
+
+    const user = await User.findById(userId).select('_id name email avatarUrl').lean();
     if (!user) return res.status(404).json({ msg: 'User not found' });
-    res.json({ user });
+
+    res.json({ user: { id: user._id.toString(), name: user.name, email: user.email, avatarUrl: user.avatarUrl || null } });
   } catch (err) {
     console.error('me err', err.message || err);
     res.status(401).json({ msg: 'Invalid token' });

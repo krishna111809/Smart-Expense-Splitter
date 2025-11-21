@@ -1,3 +1,4 @@
+// backend/utils/authMiddleware.js
 const { getUserIdFromReq } = require('./auth');
 
 // Middleware to protect routes

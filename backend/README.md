@@ -1,49 +1,68 @@
+# 🚀 Smart Expense Splitter – Backend (MERN)
 
-# 🚀 Smart Expense Splitter – Backend (MERN)  
-A complete backend system for **group expense management**, with secure authentication, group and member handling, flexible expense splitting, and a full API test suite.
+A fully-featured backend for **group expense management**, supporting secure authentication, group/member operations, flexible expense splitting, and a complete automated smoke test suite for reliability.
 
 ---
 
-# ✨ Key Features
+# ✨ Features
 
 ## 🔐 Authentication & Security
-- JWT‑based secure authentication
-- Register & Login with validation
-- Password hashing using bcrypt
-- Protected routes using middleware
-- `/api/auth/me` to fetch logged-in user info
-- Email uniqueness enforcement
+- JWT-based authentication  
+- Secure password hashing (bcrypt)  
+- Input validation with express-validator  
+- Auth middleware for protected routes  
+- `/api/auth/me` returns authenticated user  
+- Helmet + Rate Limiting + CORS enabled  
+
+---
 
 ## 👥 Groups & Members
-- Create groups with metadata
-- Owner‑based permission system
-- Add members using emailId's
-- Fetch all groups the user belongs to
-- Detailed group info with populated user data
+- Create and manage groups  
+- Owner-based permission system  
+- Add/update/remove members  
+- Fetch all groups a user belongs to  
+- Detailed group info retrieval  
+- Email-based user lookup (before adding members)  
+
+---
 
 ## 💸 Expense Management
-Supports 3 split mechanisms:
-- **EQUAL** — amount split equally
-- **CUSTOM** — shares must sum to total amount
-- **PERCENTAGE** — percentages must sum to 100%
+Supports three split types:
 
-## 🧍 User Lookup
-- Get user details by email  
-- Useful for frontend search before adding members
+| Split Type | Behavior |
+|-----------|-----------|
+| **EQUAL** | Auto-calculates equal shares (rounding-safe) |
+| **CUSTOM** | Shares must equal total amount |
+| **PERCENTAGE** | Shares must sum to 100% |
+
+Additional features:
+- Only group members can add expenses  
+- Only owner/payer can modify/delete expenses  
+- Server-level validation for all split types  
+
+---
+
+## 🔎 User Lookup API
+Quick email search:
+- `/api/users/by-email?email=`  
+Useful for frontend search-add member workflow.
+
+---
 
 ## 🧰 Technology Stack
+
 | Layer | Technology |
 |-------|------------|
 | Language | Node.js (Express) |
 | Database | MongoDB + Mongoose |
-| Auth | JWT & bcrypt |
+| Auth | JWT, bcryptjs |
 | Validation | express-validator |
-| Utils | Custom auth middleware |
+| Security | helmet, express-rate-limit, CORS |
 | Testing | axios-based smoke test |
 
 ---
 
-# 📁 Folder Structure
+# 📂 Folder Structure
 
 ```
 backend/
@@ -80,89 +99,100 @@ backend/
 
 # ⚙️ Installation & Setup
 
-## 1. Clone repository
+## 1️⃣ Clone Repository
 ```bash
 git clone https://github.com/krishna111809/Smart-Expense-Splitter.git
 cd Smart-Expense-Splitter/backend
 ```
 
-## 2. Install dependencies
+## 2️⃣ Install Dependencies
 ```bash
 npm install
 ```
 
-## 3. Environment variables  
-Create `.env` file using:
-```
+## 3️⃣ Environment Variables  
+Create a `.env` file:
+
+```env
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secure_jwt_secret
+PORT=3000
 ```
 
-## 4. Start server
+Use `.env.example` for reference.
+
+## 4️⃣ Start Development Server
 ```bash
 npm run dev
 ```
 
+Start production:
+```bash
+npm start
+```
+
 ---
 
-# 📌 API Endpoints Overview
+# 📌 API Endpoints
 
-## 🔐 Auth (`/api/auth`)
+## 🔐 Auth – `/api/auth`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/register` | Register new user |
-| POST | `/login` | Login & receive JWT |
-| GET | `/me` | Fetch current user info |
+| POST | `/register` | Register user |
+| POST | `/login` | Login & get JWT |
+| GET | `/me` | Get current user |
 
 ---
 
-## 👥 Groups (`/api/groups`)
+## 👥 Groups – `/api/groups`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/` | Create a new group |
-| GET | `/` | List groups current user belongs to |
-| POST | `/:groupId/members` | Add a member (owner-only) |
-| GET | `/:groupId` | Get full group details |
+| POST | `/` | Create group |
+| GET | `/` | List user’s groups |
+| GET | `/:groupId` | Get group details |
+| POST | `/:groupId/members` | Add member (owner-only) |
+| PUT | `/:groupId/members` | Update member (owner-only) |
+| DELETE | `/:groupId/members/:memberId` | Remove member |
+| DELETE | `/:groupId` | Delete group + all expenses |
 
 ---
 
-## 💸 Expenses (`/api/expenses`)
+## 💸 Expenses – `/api/expenses`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/` | Add new expense |
-| GET | `/?groupId=ID` | List group expenses |
-| GET | `/:id` | Get single expense details |
+| PUT | `/:id` | Modify expense |
+| DELETE | `/:id` | Delete expense |
+| GET | `/?groupId=` | List group expenses |
+| GET | `/:id` | Get single expense |
 
 ---
 
-## 🔎 USER LOOKUP — `/api/users`
-
+## 🔎 User Lookup – `/api/users`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| **GET** | `/by-email?email=ID` | Fetch user info by email |
+| GET | `/by-email?email=` | Fetch user by email |
 
 ---
 
-# 🧪 Comprehensive Smoke Test
+# 🧪 Automated Smoke Test
 
-A fully automated script that verifies:
-- Register/Login functionality
-- Duplicate registration error handling
-- Protected route checks (`/me`)
-- Group create & permission tests
-- Member addition (owner-only)
-- Expense validation errors (CUSTOM/PERCENTAGE)
-- Legitimate expense creation
-- Listing expenses
-- Unauthorized access handling
+Full automated script validates:
+- Registration  
+- Login  
+- Protected route validation  
+- Group create/update/delete  
+- Member add/update/delete  
+- Expense create/list/get/delete  
+- Permission checks  
+- Split type validation  
 
-### Run smoke test:
+### Run it:
 ```bash
-npm install axios
 node smokeTest.js
 ```
 
-Clear PASS message:
+Expected output:
 ```
 ALL TESTS PASSED ✅
 ```
@@ -171,36 +201,35 @@ ALL TESTS PASSED ✅
 
 # ☁ Deployment Guide
 
-### Render/Any Cloud:
+## Render / Railway / VPS
+
 | Setting | Value |
 |--------|--------|
 | Root Directory | `/backend` |
-| Build Command | `npm install` |
 | Start Command | `npm start` |
-| Environment | NODE, MONGODB |
+| Build Command | `npm install` |
+| Environment | NODE + MongoDB URI |
 
-Ensure environment variables are added in dashboard.
+Ensure env vars:
+- `MONGO_URI`
+- `JWT_SECRET`
+- `CORS_ORIGIN` (optional)
 
 ---
 
 # 🔮 Future Enhancements
-- Update/Delete expenses
-- Update/Delete groups
-- Admin roles for groups
-- Soft delete with audit logs
-- Per-member balance settlement engine
-- Notifications for group activity
-- Scheduled reporting
+- Admin roles  
+- Soft delete & undo  
+- Per-member balances engine  
+- Group settlement calculations    
 
 ---
 
-# 🙌 Contributing
-Pull requests and suggestions are always welcome!
-
-**Author:** *Vavilala Krishna Murthi*  
-**GitHub:** https://github.com/krishna111809  
+# 👨‍💻 Author
+**Vavilala Krishna Murthi**  
+GitHub: https://github.com/krishna111809  
 
 ---
 
 # 📄 License
-MIT License © 2025  
+MIT License © 2025

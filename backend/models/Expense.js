@@ -1,13 +1,10 @@
+// backend/models/Expense.js
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ParticipantSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  // share meaning depends on splitType:
-  // - for EQUAL: this can be omitted or set to equal share
-  // - for PERCENTAGE: store percentage (0-100)
-  // - for CUSTOM: store exact amount owed by this user
-  share: { type: Number, required: true, min: 0 }
+  share: { type: Number, min: 0 }
 }, { _id: false });
 
 const ExpenseSchema = new Schema({
@@ -30,6 +27,7 @@ const ExpenseSchema = new Schema({
  * - For CUSTOM: sum of shares should be roughly equal to amount
  * - For EQUAL: shares may be ignored or set equal on server side
  */
+
 ExpenseSchema.pre('validate', function (next) {
   try {
     const totalParticipants = this.participants?.length || 0;
